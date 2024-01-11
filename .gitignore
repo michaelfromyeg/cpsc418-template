@@ -6,6 +6,9 @@ lectures/*.pdf
 pikas/*.erl
 tutorials/*.pdf
 
+doc/
+lib/
+
 ### C.gitignore
 
 # Prerequisites
