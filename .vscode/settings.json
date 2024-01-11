@@ -1,6 +1,6 @@
 {
     "github.copilot.enable": {
-        "*": true
+        "*": false
     },
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
