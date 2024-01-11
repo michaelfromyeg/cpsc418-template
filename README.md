@@ -2,7 +2,7 @@
 
 For 2023W2.
 
-To get started, run `bash scripts/install.sh`. Should work on macOS or Linux.
+To get started, run `bash scripts/setup.sh`. Should work on macOS or Linux.
 
 On Windows? Get [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) (and Windows Terminal and Cascadia Code) and don't look back.
 
