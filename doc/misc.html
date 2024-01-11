@@ -1,0 +1,443 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module misc</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module misc</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>misc - an assortment of various functions that I've found to
+    be useful.
+<p>Copyright © 2011 Mark R. Greenstreet</p>
+
+<p><b>Authors:</b> Mark R. Greenstreet (<a href="mailto:mrg@cs.ubc.ca"><tt>mrg@cs.ubc.ca</tt></a>).</p>
+
+<h2><a name="description">Description</a></h2>misc - an assortment of various functions that I've found to
+    be useful.
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#arity-1">arity/1</a></td><td>Return the arity of <code>Fun</code>.</td></tr>
+<tr><td valign="top"><a href="#cumsum-1">cumsum/1</a></td><td>
+    Return a list where the <code>N</code><sup>th</sup> element of
+    the result is the sum of the first <code>N</code> elements of
+    <code>List</code>.</td></tr>
+<tr><td valign="top"><a href="#cumsum-2">cumsum/2</a></td><td>
+    Return a list where the <code>N</code><sup>th</sup> element of
+    the result is the <code>Acc0</code> plus the sum of the first
+    <code>N</code> elements of <code>List</code>.</td></tr>
+<tr><td valign="top"><a href="#cut-2">cut/2</a></td><td>Break L into M, roughly equal length segments.</td></tr>
+<tr><td valign="top"><a href="#deal-2">deal/2</a></td><td>Deal the elements of <code>M</code> around the <code>M</code> lists of <code>List_of_M_lists</code>.</td></tr>
+<tr><td valign="top"><a href="#index-2">index/2</a></td><td>Return the position of the first occurrence of <code>Key</code>
+    in <code>List</code>.</td></tr>
+<tr><td valign="top"><a href="#intervals-3">intervals/3</a></td><td>Divide [Lo, Hi] into N roughly intervals of roughly equal size.</td></tr>
+<tr><td valign="top"><a href="#logsteps-2">logsteps/2</a></td><td>
+    For each <code>M</code> in <code>Mant</code> and each <code>E</code> in
+    <code>Exp</code>, <code>M*10<sup>E</sup></code> is an element of
+    the return list.</td></tr>
+<tr><td valign="top"><a href="#mod-2">mod/2</a></td><td>like the <code>rem</code> BIF but result has same sign as <code>M</code>.</td></tr>
+<tr><td valign="top"><a href="#msg_dump-1">msg_dump/1</a></td><td>Print the pending messages of a process -- for debugging.</td></tr>
+<tr><td valign="top"><a href="#msg_dump-2">msg_dump/2</a></td><td>Print the pending messages of a process -- for debugging.</td></tr>
+<tr><td valign="top"><a href="#neighbours-1">neighbours/1</a></td><td>
+    Return a list of tuples of all adjacent pairs of elements of list.</td></tr>
+<tr><td valign="top"><a href="#pow-2">pow/2</a></td><td><code>N</code> raised to the <code>M</code><sup>th</sup> power.</td></tr>
+<tr><td valign="top"><a href="#print-1">print/1</a></td><td>Equivalent to <a href="#print-2"><tt>print(Term, 100)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#print-2">print/2</a></td><td> Print an erlang term on standard out.</td></tr>
+<tr><td valign="top"><a href="#rlist-1">rlist/1</a></td><td>Equivalent to <a href="#rlist-2"><tt>rlist(N, 10)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#rlist-2">rlist/2</a></td><td>Return a list of <code>N</code> random elements.</td></tr>
+<tr><td valign="top"><a href="#rlist-3">rlist/3</a></td><td>Return a list of <code>N</code> elements.</td></tr>
+<tr><td valign="top"><a href="#sync-1">sync/1</a></td><td>Equivalent to <a href="#sync-2"><tt>sync(P, infinity)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#sync-2">sync/2</a></td><td> Synchronize with process <code>P</code>.</td></tr>
+<tr><td valign="top"><a href="#sync-3">sync/3</a></td><td>Equivalent to <a href="#sync-4"><tt>sync(P, infinity, SndToken, RcvToken)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#sync-4">sync/4</a></td><td> Synchronize with process <code>P</code>.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="arity-1">arity/1</a></h3>
+<div class="spec">
+<p><tt>arity(F::Fun) -&gt; integer()</tt><br></p>
+<p> </p>
+</div><p>Return the arity of <code>Fun</code>.
+    If <code>Fun</code> is not a function, then the atom
+    <code>'false'</code> is returned.</p>
+
+<h3 class="function"><a name="cumsum-1">cumsum/1</a></h3>
+<div class="spec">
+<p><tt>cumsum(L::List) -&gt; [number()]</tt>
+<ul class="definitions"><li><tt>List = [number()]</tt></li></ul></p>
+<p> </p>
+</div><p>
+    Return a list where the <code>N</code><sup>th</sup> element of
+    the result is the sum of the first <code>N</code> elements of
+    <code>List</code>.  Corresponds to the cumsum function from
+    Matlab.</p>
+
+<h3 class="function"><a name="cumsum-2">cumsum/2</a></h3>
+<div class="spec">
+<p><tt>cumsum(Acc0, L::List) -&gt; [number()]</tt>
+<ul class="definitions"><li><tt>List = [number()]</tt></li></ul></p>
+<p> </p>
+</div><p>
+    Return a list where the <code>N</code><sup>th</sup> element of
+    the result is the <code>Acc0</code> plus the sum of the first
+    <code>N</code> elements of <code>List</code>.</p>
+
+<h3 class="function"><a name="cut-2">cut/2</a></h3>
+<div class="spec">
+<p><tt>cut(L, M) -&gt; List_of_M_lists</tt><br></p>
+<p> </p>
+</div><p>Break L into M, roughly equal length segments.
+  Parameters:
+  <ul>
+    <li><code>L</code>: a list.</li>
+    <li><code>M</code>: a positive integer -- the number of segments to create from <code>L</code>.<br>
+         Alternatively, <code>M</code> can be a non-empty list, in which case,
+         <code>length(M)</code> is used as the number of segments to make.
+    </li>
+  </ul>
+  Result:
+  <ul>
+    <li><code>List_of_M_lists</code>: Each of the <code>M</code>
+      segments has a length of <code>length(L) div M</code> or
+      <code>(length(L) div M) + 1</code>.
+    </li>
+  </ul>
+  Example:
+  <ul>
+    <li><code>cut([0, 1, 2, 3, 4], 3) -&gt; [[0], [1,2], [3,4]]</code></li>
+  </ul></p>
+<p><b>See also:</b> <a href="#deal-2">deal/2</a>.</p>
+
+<h3 class="function"><a name="deal-2">deal/2</a></h3>
+<div class="spec">
+<p><tt>deal(L, M) -&gt; List_of_M_lists</tt><br></p>
+<p> </p>
+</div><p>Deal the elements of <code>M</code> around the <code>M</code> lists of <code>List_of_M_lists</code>.
+  Parameters:
+  <ul>
+    <li><code>L</code>: a list.</li>
+    <li><code>M</code>: a positive integer -- the number dealt lists to create from <code>L</code>.<br>
+         Alternatively, <code>M</code> can be a non-empty list, in which case,
+         <code>length(M)</code> is used as the number of new lists to make.
+    </li>
+  </ul>
+  Result:
+  <ul>
+    <li><code>List_of_M_lists</code>: The elements of <code>L</code> are
+      'dealt' in a round-robin fashion in to the <code>M</code> lists
+      of <code>List_of_M_lists</code>.
+      <ul>
+        <li><code>hd(hd(List_of_M_lists)) = hd(L)</code></li>
+        <li><code>hd(lists:nth(I, List_of_M_lists)) = lists:nth(I, L)</code>
+          for <code>I</code> between 1 and <code>M</code> inclusive.
+        </li>
+        <li><code>lists:nth((N div M)lists:nth((N rem M)+1, List_of_M_lists))
+              = lists:nth(N+1, L)</code>,
+          for <code>N</code> between 0 and <code>length(L)-1</code> inclusive.
+        </li>
+      </ul>
+    </li>
+  </ul>
+  Example:
+  <ul>
+    <li><code>deal([0, 1, 2, 3, 4], 3) -&gt; [[0,3], [1,4], [2]]</code></li>
+  </ul></p>
+<p><b>See also:</b> <a href="#cut-2">cut/2</a>.</p>
+
+<h3 class="function"><a name="index-2">index/2</a></h3>
+<div class="spec">
+<p><tt>index(Key, List) -&gt; integer() | false</tt><br></p>
+<p> </p>
+</div><p>Return the position of the first occurrence of <code>Key</code>
+    in <code>List</code>.
+    If <code>List</code> has no element that matches <code>Key</code>,
+    then false is returned.</p>
+
+<h3 class="function"><a name="intervals-3">intervals/3</a></h3>
+<div class="spec">
+<p><tt>intervals(Lo, Hi, N) -&gt; List</tt><br></p>
+<p> </p>
+</div><p>Divide [Lo, Hi] into N roughly intervals of roughly equal size.
+  <ul>
+    <li><code>Lo</code> and <code>Hi</code> must be integers or floats.</li>
+    <li><code>N</code> must be an integer or a list.</li>
+      <ul>
+        <li> If <code>is_list(L)</code> then <code>intervals(Lo, Hi, L)</code>
+             is equivalent to <code>intervals(Lo, Hi, length(L)</code>.
+             This feature was added on 2017 Feb. 2 for consistency with
+             <a docgen-rel="seeerl" docgen-href="cut" href="cut.html"><code>cut</code></a>.
+        </li>
+        <li> The rest of this description of <code>intervals</code> describes
+             <code>interavals(Lo, Hi, N) when is_integer(N)</code>.
+        </li>
+      </ul>
+    <li><code>List</code> is a list of intervals.  Each interval is
+      a tuple, <code>{Lo_i, Hi_i}</code> where
+      <code>Lo_i</code> is the lower bound for the
+      <code>i<sup>th</sup></code> interval, and
+      <code>Hi_i</code> is the upper bound.
+      <ul>
+        <li> If <code>Lo</code> and <code>Hi</code> are both integers,
+          then intervals in <code>List</code> have integer bounds.
+        </li>
+        <li> If either <code>Lo</code> or <code>Hi</code> is a float,
+          then intervals in <code>List</code> have floating
+          point numbers for their bounds.
+        </li>
+        <li> If either <code>Lo</code> or <code>Hi</code> is an integer
+          whose magnitude is too large to represent as a float and the
+          other is a float, then <code>intervals(Lo, Hi, N)</code> will
+          produce a 'bad argument in an arithmetic expression' error.
+        </li>
+      </ul>
+    </li>
+  </ul>
+  Examples:
+  <ul>
+   <li><code>misc:intervals(1,100,7) -&gt;</code><b></b>
+     <code>[{1,15},{15,29},{29,43},{43,57},{57,71},{71,85},{85,100}]</code>
+   </li>
+   <li><code>misc:intervals(1.0,100,7) -&gt;</code><b></b>
+     <code>[{1.00,15.1429},{15.1429,29.2857},{29.2857,43.4286},{43.4286,57.5714},{57.5714,71.7143},{71.7143,85.8571},{85.8571,100}]</code>
+   </li>
+  </ul></p>
+
+<h3 class="function"><a name="logsteps-2">logsteps/2</a></h3>
+<div class="spec">
+<p><tt>logsteps(Mant, Exp) -&gt; [number()]</tt>
+<ul class="definitions"><li><tt>Mant = [number()]</tt></li><li><tt>Exp = [number()]</tt></li></ul></p>
+<p> </p>
+</div><p>
+    For each <code>M</code> in <code>Mant</code> and each <code>E</code> in
+    <code>Exp</code>, <code>M*10<sup>E</sup></code> is an element of
+    the return list.
+    <br>
+    Example: <code>logsteps([1,2,5], lists:seq(-1,2) -&gt; [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500]. </code>
+    <br>
+    <code>logsteps</code> can be handy for generating a sequence of
+    problem sizes for run-time measurements.</p>
+
+<h3 class="function"><a name="mod-2">mod/2</a></h3>
+<div class="spec">
+<p><tt>mod(N, M) -&gt; rQ</tt><br></p>
+<p> </p>
+</div><p>like the <code>rem</code> BIF but result has same sign as <code>M</code>.
+  <ul>
+    <li><code>N</code> and <code>M</code> must be integers or floats.</li>
+    <li>If <code>N</code> and <code>M</code> are both integers, then the result is an integer.</li>
+    <li>If either <code>N</code> or <code>M</code> is a float, then the result is a float.</li>
+      a tuple, <code>{Lo_i, Hi_i}</code> where
+  </ul>
+  Result:
+  <ul>
+    <li>If <code>M == 0</code> then <code>Q = N</code>.</li>
+    <li>If <code>M /= 0</code> then <code>Q IN [0, M)</code>.</li>
+    <li>If <code>M</code> is not 0, then <code>N - Q</code> is a multiple of <code>M</code>.</li>
+  </ul></p>
+
+<h3 class="function"><a name="msg_dump-1">msg_dump/1</a></h3>
+<div class="spec">
+<p><tt>msg_dump(Patterns) -&gt; failed</tt>
+<ul class="definitions"><li><tt>Patterns = [string()]</tt></li></ul></p>
+<p> </p>
+</div><p>Print the pending messages of a process -- for debugging.
+    <code>msg_dump(Patterns)</code> is equivalent to
+    <code>msg_dump(nobody, Patterns)</code>.</p>
+
+<h3 class="function"><a name="msg_dump-2">msg_dump/2</a></h3>
+<div class="spec">
+<p><tt>msg_dump(Who, Patterns) -&gt; failed</tt>
+<ul class="definitions"><li><tt>Who = string() | nobody</tt></li><li><tt>Patterns = [string()]</tt></li></ul></p>
+<p> </p>
+</div><p>Print the pending messages of a process -- for debugging.
+    <code>msg_dump</code> prints an error message where each line
+    is prefixed by the process pid and a colon.  It states that a
+    receive operation timed out, prints the list of patterns, and
+    then prints all pending messages for the process.
+    <ul>
+      <li> If <code>Who</code> is a string, then the first line printed is
+      	 <dl><dd><code>"$PID: receive timed out in $Who"</code></dd></dl>
+        where <code>$PID$</code> is the PID of this process,
+        and <code>$Who</code> is the string from <code>Who</code>.</li>
+      <li> If <code>Who</code> is the atom <code>'nobody'</code>,
+        then the first line printed is
+        <dl><dd><code>"$PID: receive timed out</code></dd></dl>
+        where <code>$PID$</code> is the PID of this process.</li>
+    </ul>
+    <code>Patterns</code> is the list of strings that describe what
+    <code>receive</code> was looking for.
+    <br>
+    <code>msg_dump</code> returns the atom <code>'failed'</code>
+    <br>
+    <b>Note:</b> if the desired message were to arrive while we are printing,
+    then it is possible that the pattern would be displayed, and later
+    a message that matches that pattern would be printed.</p>
+
+<h3 class="function"><a name="neighbours-1">neighbours/1</a></h3>
+<div class="spec">
+<p><tt>neighbours(T::List) -&gt; TupleList</tt><br></p>
+<p> </p>
+</div><p>
+    Return a list of tuples of all adjacent pairs of elements of list.
+    <br>
+    Example: <code>neighbours([1,2,3,5,7,11]) -&gt; [{1,2},{2,3},{3,5},{5,7},{7,11}].</code>
+    <br>
+    If <code>List</code> is empty or a singleton, then <code>TupleList</code>
+    is empty.</p>
+
+<h3 class="function"><a name="pow-2">pow/2</a></h3>
+<div class="spec">
+<p><tt>pow(N::number(), M::number()) -&gt; number()</tt><br></p>
+<p> </p>
+</div><p><code>N</code> raised to the <code>M</code><sup>th</sup> power.
+     <ul>
+       <li>
+         If <code>M</code> is an integer, then <code>N<sup>M</sup></code>
+         is computed using the Russian Peasant algorithm with
+ 	  <it>O(</it>log <code>N</code><it>)</it> multiplications.
+         This produces an exact answer when <code>N</code> is an integer.
+         Furthermore, it avoids an exception when
+ 	  <code>N <it>&lt; 0</it></code>.
+       </li>
+       <li>
+         Otherwise, <code>M</code> must be a float, in which case
+         <code>N<sup>M</sup></code> is computed using
+         <a href="http://www.erlang.org/doc/man/math.html#pow-2"><code>math:pow/2</code></a>.
+       </li>
+     </ul>
+     <p>If <code>N <it>=0</it></code> and <code>M <it>&lt; 0</it></code>,
+     then the atom <code>'undefined'</code> is returned.
+     If <code>N <it>&lt; 0</it></code> and <code>M</code> is a float, then
+     an arithmetic exception occurs.  Likewise, there is an exception when
+     <code>M</code> is a float and the <code>N<sup>M</sup></code>
+     produces a floating point overflow.</p>
+     <p>Finally, if <code>N</code> is a (deep) list and <code>M</code> is a number,
+     <code>pow(N, M)</code> returns the list obtained by applying <code>pow</code>
+     to each element of <code>N</code> using exponent <code>M</code>.  Likewise if
+     <code>N</code> is a number and <code>M</code> is a (deep) list.  If <code>N</code>
+     and <code>M</code> are both lists of the same length, the <code>pow</code> is
+     applied to the pairs of corresponding values of <code>N</code> and <code>M</code>.
+     </p></p>
+
+<h3 class="function"><a name="print-1">print/1</a></h3>
+<div class="spec">
+<p><tt>print(Term) -&gt; ok</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="#print-2"><tt>print(Term, 100)</tt></a>.</p>
+
+
+<h3 class="function"><a name="print-2">print/2</a></h3>
+<div class="spec">
+<p><tt>print(Term, N) -&gt; ok</tt><br></p>
+<p> </p>
+</div><p> Print an erlang term on standard out.
+    Unlike the erlang shell, print always prints a list of integers as a list of integers.
+    Thus, <code>print("hello world"</code> is equivalent to
+    <code>io:format("~s", "[104,101,108,108,111,32,119,111,114,108,100]")</code>.
+    The point behind this is to prevent lists that really are supposed to be lists of
+    integers from printing as strings just because every element of the list had a value
+    in the range 32..127.
+    <br>
+    <code>N</code> gives (roughly) the number of terms to print.  This means that if
+    you ask to print a really big term, erlang won't be spewing stuff for several hours.
+    If you want it to print the whole thing, use the atom <code>'infinity'</code> for
+    <code>N</code>.</p>
+
+<h3 class="function"><a name="rlist-1">rlist/1</a></h3>
+<div class="spec">
+<p><tt>rlist(N) -&gt; List</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="#rlist-2"><tt>rlist(N, 10)</tt></a>.</p>
+
+
+<h3 class="function"><a name="rlist-2">rlist/2</a></h3>
+<div class="spec">
+<p><tt>rlist(N, M) -&gt; List</tt>
+<ul class="definitions"><li><tt>N = integer()</tt></li><li><tt>M = number()</tt></li><li><tt>List = [integer()]</tt></li></ul></p>
+<p> </p>
+</div><p>Return a list of <code>N</code> random elements.  If
+    <ul>
+      <li><code>M</code> is an integer, then the values are chosen
+        uniformly from 1..<code>M</code>.</li>
+      <li><code>M</code> is an floating point number, then the values are chosen
+        uniformly from [0, M).</li>
+    </ul></p>
+
+<h3 class="function"><a name="rlist-3">rlist/3</a></h3>
+<div class="spec">
+<p><tt>rlist(N, M, State0) -&gt; {List, State1}</tt>
+<ul class="definitions"><li><tt>N = integer()</tt></li><li><tt>M = number()</tt></li><li><tt>State0 = <a href="#type-ran">ran()</a></tt></li><li><tt>List = [integer()]</tt></li><li><tt>State1 = <a href="#type-ran">ran()</a></tt></li></ul></p>
+<p> </p>
+</div><p>Return a list of <code>N</code> elements.  If
+    <ul>
+      <li><code>M</code> is an integer, then the values are chosen
+        uniformly from 1..<code>M</code>.</li>
+      <li><code>M</code> is an floating point number, then the values are chosen
+        uniformly from [0, M).</li>
+    </ul>
+    <code>State0</code> is the starting state for the pseudo-random number generator.
+    <code>rlist</code> returns the random list and the state for the PRNG at the end of
+    generating the list.</p>
+
+<h3 class="function"><a name="sync-1">sync/1</a></h3>
+<div class="spec">
+<p><tt>sync(P) -&gt; ok | exit | failed</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="#sync-2"><tt>sync(P, infinity)</tt></a>.</p>
+
+
+<h3 class="function"><a name="sync-2">sync/2</a></h3>
+<div class="spec">
+<p><tt>sync(P, TimeOut) -&gt; ok | failed</tt>
+<ul class="definitions"><li><tt>P = pid()</tt></li><li><tt>TimeOut = integer() | infinity</tt></li></ul></p>
+<p> </p>
+</div><p> Synchronize with process <code>P</code>.
+    This process sends a 'sync' message to <code>P</code>, and
+    <code>P</code> should call this function to send a 'sync'
+    message to us.  When we receive the message from <code>P</code>
+    we continue.  This ensures that both processes have made it to
+    the point of their <code>sync</code> calls before either proceeds.</p>
+
+<h3 class="function"><a name="sync-3">sync/3</a></h3>
+<div class="spec">
+<p><tt>sync(P, SndToken, RcvToken) -&gt; ok | <a href="#type-termR">termR()</a> | failed</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="#sync-4"><tt>sync(P, infinity, SndToken, RcvToken)</tt></a>.</p>
+
+
+<h3 class="function"><a name="sync-4">sync/4</a></h3>
+<div class="spec">
+<p><tt>sync(P, TimeOut, SndToken, RcvToken) -&gt; ok | <a href="#type-termR">termR()</a> | failed</tt>
+<ul class="definitions"><li><tt>P = pid()</tt></li><li><tt>TimeOut = integer() | infinity</tt></li><li><tt>SndToken = <a href="#type-termS">termS()</a></tt></li><li><tt>RcvToken = <a href="#type-termR">termR()</a></tt></li></ul></p>
+<p> </p>
+</div><p> Synchronize with process <code>P</code>.
+    This process sends <code>SndToken</code> to <code>P</code>, and
+    <code>P</code> should respond by making a call to one of the versions
+    of <code>sync</code> with this process as the target process.
+    <ul>
+      <li> If we receive <code>RcvToken</code>, we return it.</li>
+      <li> If we receive the default token, we return <code>'ok'</code>.</li>
+      <li> If a timout occurs, we print a message dump and return
+ 		<code>'failed'</code>.</li>
+    </ul>
+    If <code>SndToken</code> is the empty tuple, <code>{}</code>, then
+    the default <code>msg:sync</code> token is sent.  Likewise, if
+    <code>RcvToken</code> is the empty tuple, then we only look to receive
+    the default <code>msg:sync</code> token.
+    <br>
+    A successful return from <code>sync</code> ensures that this process
+    and process <code>P</code> have both reached the synchronization point
+    before either proceeds.</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc</i></p>
+</body>
+</html>

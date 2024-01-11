@@ -1,0 +1,14 @@
+{
+    "recommendations": [
+        "pgourlain.erlang",
+        "szTheory.erlang-formatter",
+        // these are personal, but I really like them
+        "valentjn.vscode-ltex",
+        "EditorConfig.EditorConfig",
+        "yzhang.markdown-all-in-one",
+        "DavidAnson.vscode-markdownlint"
+    ],
+    "unwantedRecommendations": [
+        "erlang-ls.erlang-ls"
+    ]
+}

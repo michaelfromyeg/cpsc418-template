@@ -1,0 +1,397 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module time_it</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module time_it</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>time_it -- functions for measuring execution time.
+<p>Copyright © 2011 Mark R. Greenstreet</p>
+
+<p><b>Authors:</b> Mark R. Greenstreet (<a href="mailto:mrg@cs.ubc.ca"><tt>mrg@cs.ubc.ca</tt></a>).</p>
+
+<h2><a name="description">Description</a></h2>time_it -- functions for measuring execution time.
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-cont_spec">cont_spec()</a></h3>
+<p><tt>cont_spec() = integer() | float() | {integer(), float()}</tt></p>
+<p>A "continue" specification -- a limit on the number of times to call
+   the function being timed, and/or a limit on the total execution time
+   for those calls.  For example, let <code>CS</code> be a parameter of
+   type <code>cont_spec</code> to <code>t/2</code> or <code>t/3</code>,
+   and let <code>Time_This</code> be the function whose execution time
+   is being measured.
+   <ul>
+     <li>If <code>CS</code> is an integer, then it specifies how many times
+ 	the <code>Time_This</code> function should be executed.</li>
+     <li>If <code>CS</code> is a float, then it specifies the total elapsed
+       time (in seconds) for executing the <code>Time_This</code> function.
+ 	More precisely, the <code>Time_This</code> function will be
+ 	called until this limit is met or exceeded.</li>
+     <li>If <code>CS</code> is a tuple of the form
+ 	<code>{N_iter, T_limit}</code> then the <code>Time_This</code>
+ 	function will be executed at most <code>N_iter</code> times or
+ 	until the total elapsed time exceeds <code>T_limit</code>.</li>
+   </ul>
+   <b>Failures</b>: If the <code>Time_This</code> function returns the
+   atom <code>'failed'</code> it is deemed to have failed.  The
+   <code>t(...)</code> function will terminate, returning the atom
+   <code>'failed'</code>.</p>
+
+<h3 class="typedecl"><a name="type-contfn">contfn()</a></h3>
+<p><tt>contfn() = <a href="#type-contfn0">contfn0()</a> | <a href="#type-contfnA">contfnA()</a></tt></p>
+<p>A "continue" function for the <code>t(...)</code> functions</p>
+
+<h3 class="typedecl"><a name="type-contfn0">contfn0()</a></h3>
+<p><tt>contfn0() = fun((N::integer, T_total::float()) -&gt; boolean())</tt></p>
+<p>A "continue" function for the <code>t(...)</code> functions
+    without an "accumulator" argument.</p>
+
+<h3 class="typedecl"><a name="type-contfnA">contfnA()</a></h3>
+<p><tt>contfnA() = fun((N::integer, T_total::float(), Acc::term) -&gt; boolean())</tt></p>
+<p>A "continue" function for the <code>t(...)</code> functions
+    with an "accumulator" argument.</p>
+
+<h3 class="typedecl"><a name="type-postfn">postfn()</a></h3>
+<p><tt>postfn() = <a href="#type-postfn0">postfn0()</a> | <a href="#type-postfnA">postfnA()</a></tt></p>
+<p>Post-processing for the <code>t(...)</code> functions.</p>
+
+<h3 class="typedecl"><a name="type-postfn0">postfn0()</a></h3>
+<p><tt>postfn0() = fun((N::integer, T_total::float()) -&gt; term())</tt></p>
+<p>Post-processing for the <code>t(...)</code> functions without an
+    "accumulator".</p>
+
+<h3 class="typedecl"><a name="type-postfnA">postfnA()</a></h3>
+<p><tt>postfnA() = fun((N::integer, T_total::float()) -&gt; term())</tt></p>
+<p>Post-processing for the <code>t(...)</code> functions with an
+    "accumulator".</p>
+
+<h3 class="typedecl"><a name="type-result_atom">result_atom()</a></h3>
+<p><tt>result_atom() = mean | std | raw | values</tt></p>
+
+
+<h3 class="typedecl"><a name="type-result_spec">result_spec()</a></h3>
+<p><tt>result_spec() = <a href="#type-result_atom">result_atom()</a> | [<a href="#type-result_atom">result_atom()</a>]</tt></p>
+<p>A "result" specification.  The return value of the
+  <code>t/2</code> or <code>t/3</code> function will be an association
+  list.  The tuples to include in the list are specified by the
+  <code>result_atom</code> or list of such atoms as described below:
+  <ul>
+    <li> <code>mean</code>: include a tuple of the form
+ 	<code>{mean, Mean}</code> where <code>Mean</code> is the
+ 	average execution time of the <code>Time_This</code> function.</li>
+    <li> <code>std</code>: include a tuple of the form
+ 	<code>{std, Std}</code> where <code>Std</code> is the (sample)
+ 	standard-deviation of the execution times of the
+  	<code>Time_This</code> function.</li>
+    <li> <code>raw</code>: include a tuple of the form
+ 	<code>{raw, Times}</code> where <code>Times</code> is a list
+ 	of the elapsed times for the executions of the <code>Time_This</code>
+ 	function.</li>
+    <li> <code>values</code>: include a tuple of the form
+ 	<code>{values, V}</code> where <code>V</code> is a list
+ 	of the return values from the executions of the
+ 	<code>Time_This</code> function.</li>
+  </ul></p>
+
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#elapsed-2">elapsed/2</a></td><td></td></tr>
+<tr><td valign="top"><a href="#how_many_runs-2">how_many_runs/2</a></td><td> determine how many times a function needs to be called to use
+    a total elapsed time in a given interval.</td></tr>
+<tr><td valign="top"><a href="#log-1">log/1</a></td><td>%%   Create a new event log with an entry for <code>PlainString</code>.</td></tr>
+<tr><td valign="top"><a href="#log-2">log/2</a></td><td>Create or update an event log.</td></tr>
+<tr><td valign="top"><a href="#log-3">log/3</a></td><td>Generate an event log.</td></tr>
+<tr><td valign="top"><a href="#perseverate-2">perseverate/2</a></td><td>Call a function multiple times.</td></tr>
+<tr><td valign="top"><a href="#print_log-1">print_log/1</a></td><td>Print the contents of an event log to the standard output.</td></tr>
+<tr><td valign="top"><a href="#t-1">t/1</a></td><td>Measure the mean and standard deviation of the elapsed time for
+    executing a function provided by the caller.</td></tr>
+<tr><td valign="top"><a href="#t-2">t/2</a></td><td>Measure the execution time of <code>Time_This</code>.</td></tr>
+<tr><td valign="top"><a href="#t-3">t/3</a></td><td>A wrapper function that calls
+    <code>t(TimeThis, ContinueFn, AccFn, Acc0, PostFn)</code>.</td></tr>
+<tr><td valign="top"><a href="#t-5">t/5</a></td><td>Measure the execution time of a function provided by the caller.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="elapsed-2">elapsed/2</a></h3>
+<div class="spec">
+<p><tt>elapsed(T0, T1) -&gt; any()</tt></p>
+<p> </p>
+</div>
+
+<h3 class="function"><a name="how_many_runs-2">how_many_runs/2</a></h3>
+<div class="spec">
+<p><tt>how_many_runs(F, Tbnds::T) -&gt; integer()</tt><br></p>
+<p> </p>
+</div><p> determine how many times a function needs to be called to use
+    a total elapsed time in a given interval.
+   In particular,
+   <ul>
+     <li> <code>how_many_runs(F, {Tlo, Thi})</code> estimates how many times
+       to call <code>F</code> so that the total elapsed time will be
+       between <code>Tlo</code> and <code>Thi</code>.</li>
+     <li> <code>how_many_runs(F, T)</code> when <code>T</code> is an integer
+       of float is equivalent to <code>how_many_runs(F, {T, T})</code> --
+       in other words, <code>how_many_runs</code> tries to get as close
+ 	to the target elapsed time, <code>T</code> as it can.  See the
+       caveats below for the limits of the accuracy of
+       <code>how_many_runs</code></li>
+   </ul>
+   The implementation uses binary search.  This means that we can't
+   guarantee that the actual runtime will actually be in the interval:
+   <ul>
+     <li> Variations in the elapsed time for different executions can
+ 	cause inconsistencies in the result.</li>
+     <li> If <code>Tlo</code> and <code>Thi</code> are sufficiently
+ 	close to each other there may be no suitable number of calls.</li>
+     <li> If a single execution of <code>F</code> takes longer than
+       <code>Thi</code>, then <code>how_many_runs</code> will return
+       the integer <code>1</code>.</li>
+   </ul>
+   With these limitations in mind, the function
+   <code>how_many_runs(...)</code> can be helpful for estimating a
+   "reasonable" number of executions to use for making time measurements.
+   In particular, if the execution time of <code>F</code> is small compared
+   with the granularity of
+   <a href="http://www.erlang.org/doc/man/erlang.html#monotonic_time-0"><code>erlang:monotonic_time()</code></a>,
+   then <code>how_many_runs(F, ...)</code> can give a reasonable
+   choice for how many times to call <code>F</code> to get meaningful
+   time measurements.
+   <br>
+  See also: <a docgen-rel="seemfa" docgen-href="time_it#perseverate/2" href="time_it.html#perseverate-2"><code>time_it:perseverate/2</code></a>.</p>
+
+<h3 class="function"><a name="log-1">log/1</a></h3>
+<div class="spec">
+<p><tt>log(PlainString) -&gt; <a href="#type-event_log">event_log()</a></tt><br></p>
+<p> </p>
+</div><p>%%   Create a new event log with an entry for <code>PlainString</code>.</p>
+
+<h3 class="function"><a name="log-2">log/2</a></h3>
+<div class="spec">
+<p><tt>log(Format::Format_or_Log, Data::Data_or_PlainString) -&gt; <a href="#type-event_log">event_log()</a></tt>
+<ul class="definitions"><li><tt>Format_or_Log = string() | <a href="#type-event_log">event_log()</a></tt></li><li><tt>Data_or_PlainString = [term()] | string()</tt></li></ul></p>
+<p> </p>
+</div><p>Create or update an event log.
+    There are two ways to call this function:
+    <ul>
+      <li> <code>log(Format::string(), Data::[term()]</code> <br>
+        Create a new event log with an entry for <code>Format</code> and
+        <code>Data</code>.  The <code>Format</code> must be a non-empty
+        string.</li>
+      <li> <code>log(Log::event_log(), PlainString::string()</code> <br>
+        Add an entry to <code>Log</code> for <code>PlainString</code>.</li>
+    </ul></p>
+
+<h3 class="function"><a name="log-3">log/3</a></h3>
+<div class="spec">
+<p><tt>log(Log, Format, Data) -&gt; <a href="#type-event_log">event_log()</a></tt>
+<ul class="definitions"><li><tt>Log = <a href="#type-event_log">event_log()</a></tt></li><li><tt>Format = string()</tt></li><li><tt>Data = [term()]</tt></li></ul></p>
+<p> </p>
+</div><p>Generate an event log.
+    The parameters <code>Format</code> and <code>Data</code> are
+    as for <a href="http://www.erlang.org/doc/man/io_lib.html#format-2"><code>io_lib:format(Format, Data)</code></a>.
+    The <code>log</code> function generates a record to record
+    <code>Format</code> and <code>Data</code> along with the pid of the
+    calling process and the current time.  This record is appended to the
+    log.  The log can be printed using the <code>print_log</code> function.
+    <br>
+    <b>Notes</b>
+    <ul>
+      <li> <code>event_log()</code> is a deeplist.  Thus, if
+        <code>Log1</code> and <code>Log2</code> are event logs, then so
+        are <code>[Log1, Log2]</code> and <code>[Log1 | Log2]</code>.
+ 	 This is to facilitate writing functions that return
+ 	 <code>event_log</code>'s and sending <code>event_log</code>'s
+ 	 in messages.  Merging such logs only requires wrapping them
+ 	 them up as a list.</li>
+      <li> The call to <code>io_lib:format(Format, Data)</code> is
+ 	 deferred to <code>print_log</code>.  This is done to make
+ 	 calls to the <code>log</code> function execute as quickly as
+        possible.</li>
+    </ul></p>
+
+<h3 class="function"><a name="perseverate-2">perseverate/2</a></h3>
+<div class="spec">
+<p><tt>perseverate(F, N) -&gt; <a href="#type-term1">term1()</a></tt>
+<ul class="definitions"><li><tt>F = fun(() -&gt; <a href="#type-term1">term1()</a>)</tt></li><li><tt>N = integer()</tt></li></ul></p>
+<p> </p>
+</div><p>Call a function multiple times.
+    Call the function <code>F</code> <code>N</code> times.
+    If N=0, return 'ok'.  Otherwise, return the value from the last
+    call to <code>F</code>.
+  <br>
+  See also: <a docgen-rel="seemfa" docgen-href="time_it#how_many_runs/2" href="time_it.html#how_many_runs-2"><code>time_it:how_many_runs/2</code></a>.</p>
+
+<h3 class="function"><a name="print_log-1">print_log/1</a></h3>
+<div class="spec">
+<p><tt>print_log(Log::<a href="#type-event_log">event_log()</a>) -&gt; ok</tt><br></p>
+<p> </p>
+</div><p>Print the contents of an event log to the standard output.
+    As noted above, an <code>event_log</code> is a deep list.
+    <code>print_log</code> flattens this list and then prints the
+    events in time order.  The time of the first event is taken as 0,
+    and for other events, the time is reported as the time since the
+    first event.</p>
+
+<h3 class="function"><a name="t-1">t/1</a></h3>
+<div class="spec">
+<p><tt>t(Time_This) -&gt; [{<a href="#type-result_atom">result_atom()</a>, number()}]</tt><br></p>
+<p> </p>
+</div><p>Measure the mean and standard deviation of the elapsed time for
+    executing a function provided by the caller.
+    The function will be called repeatedly until the total elapsed time
+    is at least one second.  The return value is an association list
+    of the form <code>[ {mean, Mean}, {std, Std} ]</code> where
+    <code>Mean</code> is the average elapsed time and <code>Std</code>
+    is the standard deviation.  There is no guarantee of the order of
+    these two tuples in the list.  The function
+    <a docgen-rel="seemfa" docgen-href="lists#keyfind/3" href="lists.html#keyfind-3"><code>lists:keyfind/3</code></a> should be used to extract specific values.
+    <br>
+    <b>Failures</b>: If the <code>Time_This</code> function returns the
+    atom <code>'failed'</code> it is deemed to have failed.  The
+    <code>t(...)</code> function will terminate, returning the atom
+    <code>'failed'</code>.</p>
+
+<h3 class="function"><a name="t-2">t/2</a></h3>
+<div class="spec">
+<p><tt>t(Time_This, How_Long::What) -&gt; Stuff</tt>
+<ul class="definitions"><li><tt>Time_This = fun(() -&gt; term())</tt></li><li><tt>What = <a href="#type-cont_spec">cont_spec()</a> | <a href="#type-result_spec">result_spec()</a></tt></li><li><tt>Stuff = [{<a href="#type-result_atom">result_atom()</a>, term()}]</tt></li></ul></p>
+<p> </p>
+</div><p>Measure the execution time of <code>Time_This</code>.
+    <ul>
+      <li> If <code>What</code> is a <code>cont_spec()</code>, then
+        it is interpreted as described for the
+ 	<a docgen-rel="seetype" docgen-href="#cont_spec/0" href="#type-cont_spec"><code>cont_spec()</code></a> type.  The return value of
+ 	<code>t(Time_This, What)</code> is an association list of the form
+ 	<code>[{mean, Mean}, {std, Std}]</code> where <code>Mean</code> is
+       the average time of the executions of <code>Time_This</code> and
+ 	<code>Std</code> is the standard deviation.</li>
+      <li> If <code>What</code> is a <code>result_spec</code>, it is
+ 	interpreted as described for the <a docgen-rel="seetype" docgen-href="#result_spec/0" href="#type-result_spec"><code>result_spec()</code></a> type.
+ 	The <code>Time_This</code> function will be executed until
+ 	the total elapsed time is at least one second.</li>
+    </ul>
+    <b>Failures</b>: If the <code>Time_This</code> function returns the
+    atom <code>'failed'</code> it is deemed to have failed.  The
+    <code>t(...)</code> function will terminate, returning the atom
+    <code>'failed'</code>.</p>
+
+<h3 class="function"><a name="t-3">t/3</a></h3>
+<div class="spec">
+<p><tt>t(Time_This, C::Cont, P::Result) -&gt; <a href="#type-term2">term2()</a></tt>
+<ul class="definitions"><li><tt>Time_This = fun(() -&gt; <a href="#type-term1">term1()</a>)</tt></li><li><tt>Cont = <a href="#type-contfn0">contfn0()</a> | <a href="#type-cont_spec">cont_spec()</a></tt></li><li><tt>Result = <a href="#type-postfn0">postfn0()</a> | <a href="#type-result_spec">result_spec()</a></tt></li></ul></p>
+<p> </p>
+</div><p>A wrapper function that calls
+    <code>t(TimeThis, ContinueFn, AccFn, Acc0, PostFn)</code>.
+    The <code>Cont</code> parameter gives the condition for continuing to
+    execute <code>Time_This</code> (and gathering data).
+    <ul>
+      <li> If <code>Cont</code> is a function, then it is used as
+        <code>ContinueFn</code> in <code>t/5</code>.</li>
+      <li> If <code>Cont</code> is a <code>cont_spec()</code>, then
+        it is interpreted as described for the
+ 	<a docgen-rel="seetype" docgen-href="#cont_spec/0" href="#type-cont_spec"><code>cont_spec()</code></a> type.</li>
+    </ul>
+    The <code>Result</code> parameter describes what value should be
+    returned.
+    <ul>
+      <li> If <code>Result</code> is a function, then it is used as
+        <code>PostFn</code> in <code>t/5</code>.</li>
+      <li> If <code>Result</code> is a <code>result_spec</code>, then
+ 	 it is interpreted as described for the <a docgen-rel="seetype" docgen-href="#result_spec/0" href="#type-result_spec"><code>result_spec()</code></a> type.</li>
+    </ul>
+   <b>Failures</b>: If the <code>Time_This</code> function returns the
+   atom <code>'failed'</code> it is deemed to have failed.  The
+   <code>t(...)</code> function will terminate, returning the atom
+   <code>'failed'</code>.</p>
+
+<h3 class="function"><a name="t-5">t/5</a></h3>
+<div class="spec">
+<p><tt>t(Time_This, Continue, AccFn, Acc0, PostFn) -&gt; <a href="#type-term2">term2()</a></tt>
+<ul class="definitions"><li><tt>Time_This = fun(() -&gt; <a href="#type-term1">term1()</a>)</tt></li><li><tt>Continue = <a href="#type-contfn">contfn()</a></tt></li><li><tt>AccFn = <a href="#type-accfn">accfn()</a></tt></li><li><tt>Acc0 = <a href="#type-term2">term2()</a></tt></li><li><tt>PostFn = fun((N::integer(), T_Total::float(), AccOut::<a href="#type-term2">term2()</a>) -&gt; <a href="#type-term3">term3()</a>)</tt></li></ul></p>
+<p> </p>
+</div><p>Measure the execution time of a function provided by the caller.
+    This is the most general form of the <code>t(...)</code> functions.
+    The caller provides functions to determine how many times the
+    <code>Time_This</code> function should be called, what data is
+    accumulated from these calls, and how to process the accumulated
+    data to produce the final result.
+    <br>
+    Our parameters:
+    <ul>
+      <li> <code>Time_This</code> a zero-argument function that is
+        called repeatedly.  The time for each execution is measured
+ 	 by calling
+        <a href="http://www.erlang.org/doc/man/erlang.html#monotonic_time-0"><code>erlang:monotonic_time()</code></a>
+ 	 before and after.
+      </li>
+      <li> <code>Continue</code> a boolean valued function that
+ 	 is called before each invocation of <code>Time_This</code>.
+        If <code>Continue</code> returns <code>true</code>, then
+ 	 we keep gathering timing data.  Otherwise, we're done.
+ 	 <code>Continue</code> can take two or three arguments:
+ 	 <ul>
+          <li>Continue(N, T_total)</li>
+          <li>Continue(N, T_total, Acc)</li>
+ 	 </ul>
+        where
+ 	 <ul>
+          <li> <code>N</code> is the number of times that
+            <code>Time_This</code> has been called;</li>
+          <li> <code>T_Total</code> is the total time spent in these calls;
+            and </li>
+ 	   <li> <code>Acc</code> is the value of the accumulator (see below).
+ 	   </li>
+ 	 </ul>
+      </li>
+      <li> <code>AccFn</code> and <code>AccIn</code> implement an
+        accumulator of the timing values (and optionally the return
+        values of <code>Time_This</code>).  <code>AccFn</code> can take from
+ 	 2 to 5 arguments as described below:
+ 	 <ul>
+ 	   <li> <code>AccFn(AccIn, T_elapsed)</code></li>
+ 	   <li> <code>AccFn(AccIn, T_elapsed, V)</code></li>
+ 	   <li> <code>AccFn(AccIn, N, T_total, T_elapsed)</code></li>
+ 	   <li> <code>AccFn(AccIn, N, T_total, T_elapsed, V)</code></li>
+ 	 </ul>
+ 	 where
+ 	 <ul>
+ 	   <li> <code>AccIn</code> is the result of <code>AccFn</code>
+ 	     from the previous call.  The first time <code>Time_This</code>
+ 	     is evaluated, <code>AccFn</code> is called with
+ 	     <code>AccIn = Acc0</code>.</li>
+ 	   <li> <code>T_elapsed</code> is the time that was spent for the
+ 	     current evaluation of <code>Time_This</code>.</li>
+ 	   <li> <code>N</code> is the total number of times that
+            <code>Time_This</code> has been called; and</li>
+          <li> <code>T_Total</code> is the total time spent in these calls.
+ 	   </li>
+ 	 </ul>
+ 	 Note that the values of <code>N</code> and <code>T_Total</code>
+        are accumulated by the <code>t(...)</code> function; thus
+        <code>AccFn</code> doesn't need to handle these.
+      </li>
+      <li> <code>PostFn</code> compute the final result.  In particular
+ 	 the return value of <code>t(...)</code> is
+        <code>PostFn(N, T_Total, AccOut)</code> where
+ 	 <ul>
+ 	   <li> <code>N</code> is the total number of times that
+            <code>Time_This</code> has been called;</li>
+          <li> <code>T_Total</code> is the total time spent in these calls;
+ 	     and </li>
+          <li> <code>AccOut</code> is the final result from
+ 	     <code>AccFn</code>.</li>
+ 	 </ul>
+      </li>
+    </ul></p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc</i></p>
+</body>
+</html>

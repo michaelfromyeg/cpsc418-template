@@ -1,0 +1,15 @@
+{
+    "github.copilot.enable": {
+        "*": true
+    },
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit",
+        "source.organizeImports": "explicit"
+    },
+    "[erlang]": {
+        "editor.defaultFormatter": "szTheory.erlang-formatter",
+        "editor.formatOnSave": true
+    },
+    "erlangFormatter.formatter": "erlfmt",
+}

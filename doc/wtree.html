@@ -1,0 +1,332 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module wtree</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module wtree</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>wtree - Functions to support trees of processes.
+<p>Copyright © 2016 Mark R. Greenstreet</p>
+
+<p><b>Authors:</b> Mark R. Greenstreet (<a href="mailto:mrg@cs.ubc.ca"><tt>mrg@cs.ubc.ca</tt></a>).</p>
+
+<h2><a name="description">Description</a></h2>wtree - Functions to support trees of processes.
+    We arrange the processes of a worker pool to a (nearly) balanced
+    binary tree.  We add entries to the process state list for each
+    worker so that it knows its parent and its children.  We then
+    provide functions <code>broadcast</code>, <code>reduce</code>
+    and <code>scan</code> to operate on such trees.
+    <p>
+    The <code>receive</code> operations in <code>reduce</code> and
+    <code>scan</code> include a time-out that by default is set to
+    <code>'infinity'</code> (i.e., they'll hang forever if the expected
+    message is never received).  This value can be changed for all
+    workers in a worker_pool by the <code>set_debug_timout</code>
+    function.
+    </p>
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#alive-1">alive/1</a></td><td>Equivalent to <tt>workers:alive</tt>.
+</td></tr>
+<tr><td valign="top"><a href="#barrier-1">barrier/1</a></td><td>A barrier for worker-pool <code>W</code>.</td></tr>
+<tr><td valign="top"><a href="#broadcast-2">broadcast/2</a></td><td></td></tr>
+<tr><td valign="top"><a href="#broadcast-3">broadcast/3</a></td><td>Invoke <code>Task</code> on all workers.</td></tr>
+<tr><td valign="top"><a href="#children-1">children/1</a></td><td>Return a list of the children of this process.</td></tr>
+<tr><td valign="top"><a href="#create-0">create/0</a></td><td>Create a worker-pool with the default number of processes and
+    initialize them to support the tree operations of this module.</td></tr>
+<tr><td valign="top"><a href="#create-1">create/1</a></td><td>Create a worker-pool of <code>N</code> processes and
+    initialize them to support the tree operations of this module.</td></tr>
+<tr><td valign="top"><a href="#default_debug_timeout-0">default_debug_timeout/0</a></td><td>Equivalent to <a href="workers.html#get_debug_timeout-0"><tt>workers:get_debug_timeout()</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#get-2">get/2</a></td><td>Equivalent to <a href="workers.html#get-2"><tt>workers:get(ProcState, Key)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#get-3">get/3</a></td><td>Equivalent to <a href="workers.html#get-3"><tt>workers:get(ProcState, Key, Default)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#get_debug_timeout-1">get_debug_timeout/1</a></td><td>Equivalent to <a href="workers.html#get_debug_timeout-1"><tt>workers:get_debug_timeout(ProcState)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#init-1">init/1</a></td><td>Initialize the process state of the workers of <code>W</code>
+    to support the tree operations of this module.</td></tr>
+<tr><td valign="top"><a href="#nworkers-1">nworkers/1</a></td><td>Equivalent to <a href="workers.html#nworkers-1"><tt>workers:nworkers(W)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#put-2">put/2</a></td><td>Equivalent to <a href="workers.html#put-2"><tt>workers:put(ProcState, TupleList)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#put-3">put/3</a></td><td>Equivalent to <a href="workers.html#put-3"><tt>workers:put(ProcState, Key, Value)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#random-2">random/2</a></td><td>Equivalent to <a href="workers.html#random-2"><tt>workers:random(M, ProcState0)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#reap-1">reap/1</a></td><td>Equivalent to <a href="workers.html#reap-1"><tt>workers:reap(W)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#reduce-3">reduce/3</a></td><td>Equivalent to <a href="#reduce-4"><tt>reduce(W, Leaf, Combine, fun (X) -&gt; X end)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#reduce-4">reduce/4</a></td><td>A generalized reduce operation.</td></tr>
+<tr><td valign="top"><a href="#retrieve-2">retrieve/2</a></td><td>Return a list of the values from each process of <code>W</code>.</td></tr>
+<tr><td valign="top"><a href="#rlist-3">rlist/3</a></td><td>Equivalent to <a href="workers.html#rlist-3"><tt>workers:rlist(W, N, Key)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#rlist-4">rlist/4</a></td><td>Equivalent to <a href="workers.html#rlist-4"><tt>workers:rlist(W, N, M, Key)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#scan-5">scan/5</a></td><td>A generalized scan operation.</td></tr>
+<tr><td valign="top"><a href="#set_debug_timeout-2">set_debug_timeout/2</a></td><td>Equivalent to <a href="workers.html#set_debug_timeout-2"><tt>workers:set_debug_timeout(W, T)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#update-3">update/3</a></td><td>Equivalent to <a href="workers.html#update-3"><tt>workers:update(W, Key, X)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#update-4">update/4</a></td><td>Equivalent to <a href="workers.html#update-4"><tt>workers:update(W, Key, Fun, Args)</tt></a>.
+</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="alive-1">alive/1</a></h3>
+<div class="spec">
+<p><tt>alive(W) -&gt; any()</tt></p>
+<p> </p>
+</div><p>Equivalent to <tt>workers:alive</tt>.</p>
+
+
+<h3 class="function"><a name="barrier-1">barrier/1</a></h3>
+<div class="spec">
+<p><tt>barrier(W) -&gt; ok</tt><br></p>
+<p> </p>
+</div><p>A barrier for worker-pool <code>W</code>.</p>
+
+<h3 class="function"><a name="broadcast-2">broadcast/2</a></h3>
+<div class="spec">
+<p><tt>broadcast(W, Task) -&gt; any()</tt></p>
+<p> </p>
+</div>
+
+<h3 class="function"><a name="broadcast-3">broadcast/3</a></h3>
+<div class="spec">
+<p><tt>broadcast(W, Task, Args) -&gt; ok</tt><br></p>
+<p> </p>
+</div><p>Invoke <code>Task</code> on all workers.
+  <ul>
+    <li><code>W</code> is a <code>worker_pool</code>.</li>
+    <li><code>Task</code> is a function.  If
+      <ul>
+        <li><code>Task</code> has an arity of two, then it is invoked as
+          <dl><dd><code>Task(ProcState, Arg)</code></dd></dl>
+          where
+          <ul>
+            <li><code>ProcState</code> is the current state of the
+ 		worker process, and</li>
+            <li><code>Arg</code> is the <code>N</code><sup>th</sup> element
+ 	        of <code>Args</code> when <code>Task&gt;</code> is invoked for
+ 	  	the <code>N</code><sup>th</sup> worker of <code>W</code>.</li>
+          </ul>
+        </li>
+        <li><code>Task</code> has an arity of three, then it is invoked as
+          <dl><dd><code>Task(ProcState, Arg, N)</code></dd></dl>
+ 	   where <code>ProcState</code>, <code>Arg</code>, and <code>N</code>
+ 	   are as defined above.
+        </li>
+      </ul>
+      The return value of <code>Task</code> becomes the new state of
+      the process.
+    </li>
+  </ul></p>
+
+<h3 class="function"><a name="children-1">children/1</a></h3>
+<div class="spec">
+<p><tt>children(ProcState::<a href="#type-worker_state">worker_state()</a>) -&gt; [{integer(), pid()}]</tt><br></p>
+<p> </p>
+</div><p>Return a list of the children of this process.
+    The <code>tree</code></p>
+
+<h3 class="function"><a name="create-0">create/0</a></h3>
+<div class="spec">
+<p><tt>create() -&gt; <a href="#type-worker_pool">worker_pool()</a></tt><br></p>
+<p> </p>
+</div><p>Create a worker-pool with the default number of processes and
+    initialize them to support the tree operations of this module.</p>
+
+<h3 class="function"><a name="create-1">create/1</a></h3>
+<div class="spec">
+<p><tt>create(N::integer()) -&gt; <a href="#type-worker_pool">worker_pool()</a></tt><br></p>
+<p> </p>
+</div><p>Create a worker-pool of <code>N</code> processes and
+    initialize them to support the tree operations of this module.</p>
+
+<h3 class="function"><a name="default_debug_timeout-0">default_debug_timeout/0</a></h3>
+<div class="spec">
+<p><tt>default_debug_timeout() -&gt; integer()</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="workers.html#get_debug_timeout-0"><tt>workers:get_debug_timeout()</tt></a>.</p>
+
+
+<h3 class="function"><a name="get-2">get/2</a></h3>
+<div class="spec">
+<p><tt>get(ProcState, Key) -&gt; term()</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="workers.html#get-2"><tt>workers:get(ProcState, Key)</tt></a>.</p>
+
+
+<h3 class="function"><a name="get-3">get/3</a></h3>
+<div class="spec">
+<p><tt>get(ProcState, Key, Default) -&gt; term()</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="workers.html#get-3"><tt>workers:get(ProcState, Key, Default)</tt></a>.</p>
+
+
+<h3 class="function"><a name="get_debug_timeout-1">get_debug_timeout/1</a></h3>
+<div class="spec">
+<p><tt>get_debug_timeout(ProcState) -&gt; integer()</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="workers.html#get_debug_timeout-1"><tt>workers:get_debug_timeout(ProcState)</tt></a>.</p>
+
+
+<h3 class="function"><a name="init-1">init/1</a></h3>
+<div class="spec">
+<p><tt>init(W::worker_pool) -&gt; <a href="#type-worker_pool">worker_pool()</a></tt><br></p>
+<p> </p>
+</div><p>Initialize the process state of the workers of <code>W</code>
+    to support the tree operations of this module.</p>
+
+<h3 class="function"><a name="nworkers-1">nworkers/1</a></h3>
+<div class="spec">
+<p><tt>nworkers(W) -&gt; any()</tt></p>
+<p> </p>
+</div><p>Equivalent to <a href="workers.html#nworkers-1"><tt>workers:nworkers(W)</tt></a>.</p>
+
+
+<h3 class="function"><a name="put-2">put/2</a></h3>
+<div class="spec">
+<p><tt>put(ProcState, TupleList) -&gt; NewProcState</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="workers.html#put-2"><tt>workers:put(ProcState, TupleList)</tt></a>.</p>
+
+
+<h3 class="function"><a name="put-3">put/3</a></h3>
+<div class="spec">
+<p><tt>put(ProcState, Key, Value) -&gt; NewProcState</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="workers.html#put-3"><tt>workers:put(ProcState, Key, Value)</tt></a>.</p>
+
+
+<h3 class="function"><a name="random-2">random/2</a></h3>
+<div class="spec">
+<p><tt>random(M, ProcState0::ProcStat0) -&gt; {RandNum, ProcState1}</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="workers.html#random-2"><tt>workers:random(M, ProcState0)</tt></a>.</p>
+
+
+<h3 class="function"><a name="reap-1">reap/1</a></h3>
+<div class="spec">
+<p><tt>reap(W) -&gt; any()</tt></p>
+<p> </p>
+</div><p>Equivalent to <a href="workers.html#reap-1"><tt>workers:reap(W)</tt></a>.</p>
+
+
+<h3 class="function"><a name="reduce-3">reduce/3</a></h3>
+<div class="spec">
+<p><tt>reduce(W, Leaf, Combine) -&gt; term()</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="#reduce-4"><tt>reduce(W, Leaf, Combine, fun (X) -&gt; X end)</tt></a>.</p>
+
+
+<h3 class="function"><a name="reduce-4">reduce/4</a></h3>
+<div class="spec">
+<p><tt>reduce(W, Leaf, Combine, Root) -&gt; <a href="#type-term2">term2()</a></tt>
+<ul class="definitions"><li><tt>W = <a href="#type-worker_pool">worker_pool()</a></tt></li><li><tt>Leaf = fun((ProcState::worker_state) -&gt; <a href="#type-term1">term1()</a>)</tt></li><li><tt>Combine = fun((Left::<a href="#type-term1">term1()</a>, Right::<a href="#type-term1">term1()</a>) -&gt; <a href="#type-term1">term1()</a>)</tt></li><li><tt>Root = fun((<a href="#type-term1">term1()</a>) -&gt; <a href="#type-term2">term2()</a>)</tt></li></ul></p>
+<p> </p>
+</div><p>A generalized reduce operation.
+    The <code>Leaf()</code> function is applied in each worker.
+    The results of these are combined, using a tree,
+    using <code>Combine</code>.
+    The <code>Root</code> function is applied to the final result
+    from the combine tree to produce the result of this function.
+    <br>
+    <b>Note:</b> The workers are ordered.  In particular, if one were
+    to invoke <code>update(W, 'WID', lists:seq(1:Nworkers)</code>
+    then all of the workers contributing to the <code>Left</code>
+    argument will have <code>'WID'</code> values less than those
+    contributing to the <code>Right</code>.  This interface says
+    nothing about whether or not the trees are balanced.  This means
+    that to get deterministic results, <code>Combine</code> should
+    be an <a href="http://en.wikipedia.org/wiki/Associative_property">associative</a>
+    function.</p>
+
+<h3 class="function"><a name="retrieve-2">retrieve/2</a></h3>
+<div class="spec">
+<p><tt>retrieve(W::<a href="#type-worker_pool">worker_pool()</a>, F::X) -&gt; Values::List</tt><br></p>
+<p> </p>
+</div><p>Return a list of the values from each process of <code>W</code>.
+  <ul>
+    <li>If <code>X</code> is a function of one argument, then the value for worker process <code>W_I</code> is
+      <code>X(ProcState_I)</code> where <code>ProcState_I</code> is the per-worker process state
+      for worker <code>W_I</code>.</li>
+    <li>Otherwise, the value for worker proces <code>W_I</code> is <code>wtree:get(ProcState_I, X)</code>.</li>
+  </ul></p>
+
+<h3 class="function"><a name="rlist-3">rlist/3</a></h3>
+<div class="spec">
+<p><tt>rlist(W, N, Key) -&gt; ok</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="workers.html#rlist-3"><tt>workers:rlist(W, N, Key)</tt></a>.</p>
+
+
+<h3 class="function"><a name="rlist-4">rlist/4</a></h3>
+<div class="spec">
+<p><tt>rlist(W, N, M, Key) -&gt; ok</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="workers.html#rlist-4"><tt>workers:rlist(W, N, M, Key)</tt></a>.</p>
+
+
+<h3 class="function"><a name="scan-5">scan/5</a></h3>
+<div class="spec">
+<p><tt>scan(W, Leaf1, Leaf2, Combine, Acc0) -&gt; <a href="#type-term1">term1()</a></tt>
+<ul class="definitions"><li><tt>W = <a href="#type-worker_pool">worker_pool()</a></tt></li><li><tt>Leaf1 = fun((ProcState::worker_state) -&gt; <a href="#type-term1">term1()</a>)</tt></li><li><tt>Leaf2 = fun((ProcState::worker_state, AccIn::<a href="#type-term1">term1()</a>) -&gt; <a href="#type-worker_state">worker_state()</a>)</tt></li><li><tt>Combine = fun((Left::<a href="#type-term1">term1()</a>, Right::<a href="#type-term1">term1()</a>) -&gt; <a href="#type-term1">term1()</a>)</tt></li><li><tt>Acc0 = (<a href="#type-term1">term1()</a> | fun((<a href="#type-term">term</a>(1)) -&gt; {<a href="#type-term2">term2()</a>, <a href="#type-term1">term1()</a>}))</tt></li></ul></p>
+<p> </p>
+</div><p>A generalized scan operation.
+    The <code>Leaf1()</code> function is applied in each worker process.
+    The results of these are combined, using a tree,
+    using <code>Combine</code>.
+    <br>
+    Let <code>ReduceValue</code> denote the result of applying the <code>Combine</code>
+    function at the root.
+    If <code>Acc0</code> is not a function of arity 1, the value of <code>Acc0</code>
+    is used as the initial accumulator for the left subtree, and
+    <code>scan(...)</code> returns <code>ReduceValue</code>.
+    If <code>Acc0</code> is a function of arity-1, let
+    {ReturnValue, RootValue} = Acc0(ReduceValue).  In this case, <code>RootValue</code>
+    is used as the initial accumulator for the left subtree, and<br>
+    <code>scan(W, Leaf1, Leaf2, Combine, Acc0)</code><br>
+    returns <code>ReturnValue</code>.
+    <br>
+    Results are propagated back down the tree.
+    The <code>Leaf2()</code> function is applied in each
+    worker process.  The <code>AccIn</code> argument is the result
+    of the <code>Combine</code> for everything to the left of this
+    node in the tree.  For the leftmost process, <code>Acc0</code>
+    is used.  The return value of <code>Leaf2</code> becomes the
+    state of the worker process.</p>
+
+<h3 class="function"><a name="set_debug_timeout-2">set_debug_timeout/2</a></h3>
+<div class="spec">
+<p><tt>set_debug_timeout(W, T) -&gt; ok</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="workers.html#set_debug_timeout-2"><tt>workers:set_debug_timeout(W, T)</tt></a>.</p>
+
+
+<h3 class="function"><a name="update-3">update/3</a></h3>
+<div class="spec">
+<p><tt>update(W, Key, X) -&gt; ok</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="workers.html#update-3"><tt>workers:update(W, Key, X)</tt></a>.</p>
+
+
+<h3 class="function"><a name="update-4">update/4</a></h3>
+<div class="spec">
+<p><tt>update(W, Key, Fun, Args) -&gt; ok</tt><br></p>
+<p> </p>
+</div><p>Equivalent to <a href="workers.html#update-4"><tt>workers:update(W, Key, Fun, Args)</tt></a>.</p>
+
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc</i></p>
+</body>
+</html>
