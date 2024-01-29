@@ -39,3 +39,6 @@ if grep -q "$CUSTOM_ERL" ~/.bashrc; then
 else
     echo "$CUSTOM_ERL" >> ~/.bashrc
 fi
+
+brew install rebar3
+
